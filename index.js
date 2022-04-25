@@ -1,59 +1,34 @@
+const path = require ('path');
+const fs = require ('fs');
+const fetch = require('node-fetch');
 
-const fs      = require("fs"             );
-const path    = require("path"           );
-const dirTree = require("directory-tree" );
+const functions ={
+    abFile: (validatePath) => path.isAbsolute(validatePath) ? validatePath :path.resolve(validatePath),
+    //Ruta relativa a absoluta.
 
-// const directory = './files/';
-
-//Despliegue de directorio
-// const direct = dirTree("./file.md");
-// console.log(direct);
-const filteredTree = dirTree('.', {extensions:/\.md$/}, (item, path, stats) => {
-  // console.log(stats);
-  console.log(item);
-  //console.log(path);
-  });
-console.log(filteredTree);
-
-console.log("Ingresa tu ruta de .md");
-const stdin = process.openStdin();
-stdin.addListener("data", function(ruta) {
-  
-  // console.log("Tu ruta es: " +  ruta.toString());
-  
-  let rutaString= ruta.toString(); 
-  
-  const absolutePath= path.isAbsolute(rutaString);
-  
-  console.log(absolutePath);
-  if (!absolutePath){//En caso de ser ruta relativa la volvemos en absoluta.
-    rutaString = path.resolve(rutaString); 
-  }
-  console.log("La ruta absoluta es : " +  rutaString);
-  
+// funcioin recursiva para encotrar archivos .md 
+findMd:(initialPath =>{
+  //array de los archivos en la ruta
+const arrayFiles = fs.readdirSync(initialPath);
+let filesMd = [];
+arrayFiles.forEach(theFile => {
+   //union ruta inicial con el archivo de ruta absoluta 
+   const filePath = path.join(validatePath, theFile);
+   //stats de la ruta
+   const stat =fs.statSync(filePath);
+   //confirmacion dce si la ruta es un directorio para recursion
+   if(stat.isDirectory()){ 
+   //recursion
+       filesMd = filesMd.concat(this.findMd(filePath));
+    //opbtencion en un array rutas de archivos.md
+   }else if(path.extname(filePath)=== '.md') {
+       filesMd.push(filePath);
+   }
 });
+return filesMd;
+})
 
-//FIXME:
-
-const isMarkdown = (fs, direct) => {
-  let result;
-  // console.log(path.extname(pathFile));
-  if (path.extname(fs) === ".md") {
-    // console.log("readFile");
-    result = mk(fs, direct);
-    return result;
-  } else {
-    console.log("Extensión invalida. Ingrese una ruta de un archivo de extensión markdown");
-  }
-  return isMarkdown;
-}
-  // console.log(path.extname(promptValue));
-  // if (direct.extname(path) === '.md') {
-    //       console.log('Leyendo archivo');
-    //       console.log(reading());
-    //   } else {
-      //         console.log('Su archivo no es de tipo Markdown');
-      //     }
+//extraer urls
 
 
-  module.export = isMarkdown;
+};
